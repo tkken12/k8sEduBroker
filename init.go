@@ -20,6 +20,12 @@ func init() {
 }
 
 func getKubeConfigPath() string {
+	kubeConfigPath := util.ReadBrokerConfig().K8sConfigPath
+
+	if kubeConfigPath != "" {
+		return kubeConfigPath
+	}
+
 	return ""
 }
 
