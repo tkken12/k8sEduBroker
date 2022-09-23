@@ -1,3 +1,6 @@
 {
-    "kubeConfigPath": "/root/.kube/config"
+    "kubeConfigPath": "/root/.kube/config",
+    "brokerListenPort": 30443,
+    "brokerProtocol": "http"
+
 }
