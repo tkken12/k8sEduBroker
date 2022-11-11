@@ -13,6 +13,9 @@ type BrokerConfig struct {
 	K8sConfigPath    string `json:"kubeConfigPath"`
 	BrokerListenPort int    `json:"brokerListenPort"`
 	BrokerProtocol   string `json:"brokerProtocol"`
+	PromAddress      string `json:"prometheusAddress"`
+	PromPort         int    `json:"prometheusPort"`
+	PromProtocol     string `json:"prometheusProtocol"`
 }
 
 var G_k8sClient *kubernetes.Clientset

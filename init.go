@@ -4,6 +4,8 @@ import (
 	"k8sEduBroker/logger"
 	"k8sEduBroker/util"
 
+	prom "k8sEduBroker/monitoring/prometheus"
+
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -19,6 +21,8 @@ func init() {
 	}
 
 	util.SetK8sClient(newClient(buildConfig(kubeConfigPath)))
+	prom.NewPrometheusClient()
+
 	logger.Info("set k8s client done... ")
 }
 
