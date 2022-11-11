@@ -14,6 +14,7 @@ import (
 func init() {
 
 	logger.LoggerInit()
+	logger.Info("logger initialize done.")
 
 	kubeConfigPath := getKubeConfigPath()
 	if kubeConfigPath == "" {
@@ -23,7 +24,7 @@ func init() {
 	util.SetK8sClient(newClient(buildConfig(kubeConfigPath)))
 	prom.NewPrometheusClient()
 
-	logger.Info("set k8s client done... ")
+	logger.Info("broker initialize done.")
 }
 
 func getKubeConfigPath() string {

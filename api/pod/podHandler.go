@@ -5,15 +5,44 @@ import (
 	"io/ioutil"
 	"k8sEduBroker/logger"
 	"net/http"
+
+	v1 "k8s.io/api/core/v1"
 )
 
-type PodStruct struct {
-	Command string `json:"command"`
+type PodRequestStruct struct {
+	Command string           `json:"command"`
+	Params  PodRequestParams `json:"params"`
 }
 
-func readRequest(w http.ResponseWriter, r *http.Request) PodStruct {
+type PodRequestParams struct {
+	PodName       string           `json:"podName"`
+	PodNamespaces []string         `json:"podNamespace"`
+	PodAddress    string           `json:"podAddress"`
+	VolumeMount   []v1.VolumeMount `json:"volumeMount"`
+	Volumes       []v1.Volume      `json:"volumes"`
+	NodeName      string           `json:"nodeName"`
+}
 
-	podInfo := PodStruct{}
+func readGetRequest(w http.ResponseWriter, r *http.Request) PodRequestStruct {
+
+	var podInfo = PodRequestStruct{}
+
+	for k, v := range r.URL.Query() {
+		switch k {
+		case GET:
+			for _, elem := range v {
+				json.Unmarshal([]byte(elem), &podInfo)
+			}
+
+		}
+	}
+
+	return podInfo
+}
+
+func readRequest(w http.ResponseWriter, r *http.Request) PodRequestStruct {
+
+	podInfo := PodRequestStruct{}
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -25,6 +54,11 @@ func readRequest(w http.ResponseWriter, r *http.Request) PodStruct {
 	return podInfo
 }
 
+// func PodGetHandler(w http.ResponseWriter, r *http.Request) {
+// 	podGetInfo := readGetRequest(w, r)
+
+// }
+
 func PodHandler(w http.ResponseWriter, r *http.Request) {
 	podInfo := readRequest(w, r)
 
@@ -32,5 +66,7 @@ func PodHandler(w http.ResponseWriter, r *http.Request) {
 	case CREATE:
 		return
 
+	case GET:
+		return
 	}
 }
