@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"k8sEduBroker/logger"
+	"k8sEduBroker/util"
+	"log"
 	"net/http"
 
 	v1 "k8s.io/api/core/v1"
@@ -11,12 +13,13 @@ import (
 
 type PodRequestStruct struct {
 	Command string           `json:"command"`
+	Type    string           `json:"type"`
 	Params  PodRequestParams `json:"params"`
 }
 
 type PodRequestParams struct {
 	PodName       string           `json:"podName"`
-	PodNamespaces []string         `json:"podNamespace"`
+	PodNamespaces []string         `json:"podNamespaces"`
 	PodAddress    string           `json:"podAddress"`
 	VolumeMount   []v1.VolumeMount `json:"volumeMount"`
 	Volumes       []v1.Volume      `json:"volumes"`
@@ -27,15 +30,14 @@ func readGetRequest(w http.ResponseWriter, r *http.Request) PodRequestStruct {
 
 	var podInfo = PodRequestStruct{}
 
-	for k, v := range r.URL.Query() {
-		switch k {
-		case GET:
-			for _, elem := range v {
-				json.Unmarshal([]byte(elem), &podInfo)
-			}
-
-		}
+	switch r.URL.Query()["command"][0] {
+	case GET:
+		podInfo.Command = r.URL.Query()["command"][0]
+		podInfo.Type = r.URL.Query()["type"][0]
+		json.Unmarshal([]byte(r.URL.Query()["params"][0]), &podInfo.Params)
 	}
+
+	log.Println("podInfo", podInfo)
 
 	return podInfo
 }
@@ -69,4 +71,13 @@ func PodHandler(w http.ResponseWriter, r *http.Request) {
 	case GET:
 		return
 	}
+}
+
+func PodGetHandler(w http.ResponseWriter, r *http.Request) {
+	// podInfo := readGetRequest(w, r)
+
+	util.SendResponse(w, util.ResponseBody{
+		Code:    200,
+		Message: "test",
+	})
 }
