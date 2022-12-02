@@ -54,10 +54,10 @@ func readRequest(w http.ResponseWriter, r *http.Request) PodRequestStruct {
 	return podInfo
 }
 
-func PodGetHandler(w http.ResponseWriter, r *http.Request) {
+/*func PodGetHandler(w http.ResponseWriter, r *http.Request) {
 	podGetInfo := readGetRequest(w, r)
 
-}
+}*/
 
 func PodHandler(w http.ResponseWriter, r *http.Request) {
 	podInfo := readRequest(w, r)

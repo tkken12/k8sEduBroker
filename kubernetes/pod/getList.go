@@ -24,6 +24,7 @@ type PodsBody []PodGetResBody
 
 func GetPodList(podReqBody pHandler.PodRequestParams) (PodGetResBody, error) {
 
+	podBody := PodGetResBody{}
 	podsResElem := PodsBody{}
 
 	pods, err := util.GetK8sClient().CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
@@ -32,19 +33,17 @@ func GetPodList(podReqBody pHandler.PodRequestParams) (PodGetResBody, error) {
 		return PodGetResBody{}, err
 	}
 
-	return podReqBody.extractPodList(pods, podsResElem, podReqBody.PodNamespaces), nil
+	podBody.extractPodList(pods, podsResElem, podReqBody.PodNamespaces)
+
+	return podBody, nil
 }
 
-func (podReqBody *PodRequestBody) extractPodList(pods *v1.PodList, filteredItems PodsBody, namespaces []string) PodGetResBody {
-
+func (podReqBody *PodGetResBody) extractPodList(pods *v1.PodList, filteredItems PodsBody, namespaces []string) {
 	for idx, _ := range namespaces {
 		for _, pod := range pods.Items {
 			if pod.Namespace == namespaces[idx] {
 				podReqBody.PodName = pod.Name
-				podReqBody.Na
 			}
 		}
 	}
-
-	return filteredItems
 }

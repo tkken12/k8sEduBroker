@@ -3,7 +3,6 @@ package main
 import (
 	"k8sEduBroker/common"
 	"k8sEduBroker/logger"
-	"k8sEduBroker/server"
 	"k8sEduBroker/util"
 	"net/http"
 	"strconv"
@@ -21,7 +20,7 @@ func main() {
 	case common.HTTP:
 		listenServer = http.Server{
 			Addr:    ":" + strconv.Itoa(util.GetBrokerConf().BrokerListenPort),
-			Handler: server.GetRouter(),
+			Handler: GetServer(),
 		}
 
 		err := listenServer.ListenAndServe()

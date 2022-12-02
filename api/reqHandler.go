@@ -1,8 +1,9 @@
-package server
+package api
 
 import (
 	"encoding/json"
 	"k8sEduBroker/api/pod"
+	"k8sEduBroker/common"
 	"k8sEduBroker/logger"
 	"net/http"
 )
@@ -12,12 +13,22 @@ type ResponseBody struct {
 	Message interface{}
 }
 
+type RequestHandler struct {
+	Path       string
+	HandleFunc func(http.ResponseWriter, *http.Request)
+	RestMethod string
+}
+
 var PodHandler = []RequestHandler{
-	{"/api/v1/pod", pod.PodHandler, POST},
-	{"/api/v1/pod", pod.PodHandler, PUT},
-	{"/api/v1/pod", pod.PodHandler, DELETE},
-	{"/api/v1/pod", pod.PodHandler, GET},
+	{"/api/v1/pod", pod.PodHandler, common.POST},
+	{"/api/v1/pod", pod.PodHandler, common.PUT},
+	{"/api/v1/pod", pod.PodHandler, common.DELETE},
+	{"/api/v1/pod", pod.PodHandler, common.GET},
 	// {"api/v1/node", }
+}
+
+var Handlers = [][]RequestHandler{
+	PodHandler,
 }
 
 func SendResponse(w http.ResponseWriter, resBody ResponseBody) {

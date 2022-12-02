@@ -4,9 +4,10 @@ import (
 	"k8sEduBroker/logger"
 	"k8sEduBroker/util"
 
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
+	api "k8sEduBroker/api"
+	kClient "k8sEduBroker/kubernetes/client"
+
+	"github.com/gorilla/mux"
 )
 
 func init() {
@@ -14,41 +15,21 @@ func init() {
 	logger.LoggerInit()
 	logger.Info("logger initialize done.")
 
-	kubeConfigPath := getKubeConfigPath()
-	if kubeConfigPath == "" {
-		kubeConfigPath = getRootKubeConfigPath()
-	}
+	util.SetBrokerConf(util.ReadBrokerConfig())
+	logger.Info("configuration read succeed")
 
-	util.SetK8sClient(newClient(buildConfig(kubeConfigPath)))
+	kClient.NewClient()
 	logger.Info("k8s initialize done.")
 }
 
-func getKubeConfigPath() string {
-	kubeConfigPath := util.ReadBrokerConfig().K8sConfigPath
+func GetServer() *mux.Router {
+	router := mux.NewRouter().StrictSlash(true)
 
-	if kubeConfigPath != "" {
-		return kubeConfigPath
+	for _, handler := range api.Handlers {
+		for _, elem := range handler {
+			router.HandleFunc(elem.Path, elem.HandleFunc).Methods(elem.RestMethod)
+		}
 	}
 
-	return ""
-}
-
-func getRootKubeConfigPath() string { return "/root/.kube/config" }
-
-func buildConfig(configPath string) *rest.Config {
-	kubeConfig, err := clientcmd.BuildConfigFromFlags("", configPath)
-	if err != nil {
-		logger.Fatal("invalid config file " + err.Error())
-	}
-
-	return kubeConfig
-}
-
-func newClient(k8sConfig *rest.Config) *kubernetes.Clientset {
-	clientSet, err := kubernetes.NewForConfig(k8sConfig)
-	if err != nil {
-		logger.Fatal("Failed to set kubernetes client. invalid config " + err.Error())
-	}
-
-	return clientSet
+	return router
 }
