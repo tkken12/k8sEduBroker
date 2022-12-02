@@ -1,14 +1,7 @@
 package pod
 
 import (
-	"context"
-	"k8sEduBroker/logger"
-	"k8sEduBroker/util"
-
-	pHandler "k8sEduBroker/api/pod"
-
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type PodGetResBody struct {
@@ -22,16 +15,16 @@ type PodGetResBody struct {
 
 type PodsBody []PodGetResBody
 
-func GetPodList(podReqBody pHandler.PodRequestParams) (PodGetResBody, error) {
+// func GetPodList(podReqBody pHandler.PodRequestParams) (PodGetResBody, error) {
 
 	podBody := PodGetResBody{}
 	podsResElem := PodsBody{}
 
-	pods, err := util.GetK8sClient().CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
-	if err != nil {
-		logger.Warn(err.Error())
-		return PodGetResBody{}, err
-	}
+// 	pods, err := util.GetK8sClient().CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
+// 	if err != nil {
+// 		logger.Warn(err.Error())
+// 		return PodGetResBody{}, err
+// 	}
 
 	podBody.extractPodList(pods, podsResElem, podReqBody.PodNamespaces)
 

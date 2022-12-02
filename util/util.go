@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"k8sEduBroker/logger"
+	"net/http"
 	"os"
 
 	"k8s.io/client-go/kubernetes"
@@ -13,6 +14,9 @@ type BrokerConfig struct {
 	K8sConfigPath    string `json:"kubeConfigPath"`
 	BrokerListenPort int    `json:"brokerListenPort"`
 	BrokerProtocol   string `json:"brokerProtocol"`
+	PromAddress      string `json:"prometheusAddress"`
+	PromPort         int    `json:"prometheusPort"`
+	PromProtocol     string `json:"prometheusProtocol"`
 }
 
 var G_k8sClient *kubernetes.Clientset
@@ -45,3 +49,21 @@ func ReadBrokerConfig() BrokerConfig {
 
 func GetBrokerConf() BrokerConfig         { return G_BrokerConf }
 func SetBrokerConf(readConf BrokerConfig) { G_BrokerConf = readConf }
+
+type ResponseBody struct {
+	Code    int
+	Message interface{}
+}
+
+func SendResponse(w http.ResponseWriter, resBody ResponseBody) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	resBodyMarshal, err := json.Marshal(resBody)
+	if err != nil {
+		logger.Warn("failed to send message\n" + err.Error())
+	}
+
+	w.Write(resBodyMarshal)
+	return
+}

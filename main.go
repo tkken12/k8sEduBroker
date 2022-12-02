@@ -17,6 +17,7 @@ func main() {
 	switch brokerConf.BrokerProtocol {
 	case common.HTTPS:
 		return
+
 	case common.HTTP:
 		listenServer = http.Server{
 			Addr:    ":" + strconv.Itoa(util.GetBrokerConf().BrokerListenPort),
