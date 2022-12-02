@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"k8sEduBroker/logger"
 	"k8sEduBroker/util"
-	"log"
 	"net/http"
 
 	v1 "k8s.io/api/core/v1"
@@ -36,8 +35,6 @@ func readGetRequest(w http.ResponseWriter, r *http.Request) PodRequestStruct {
 		podInfo.Type = r.URL.Query()["type"][0]
 		json.Unmarshal([]byte(r.URL.Query()["params"][0]), &podInfo.Params)
 	}
-
-	log.Println("podInfo", podInfo)
 
 	return podInfo
 }

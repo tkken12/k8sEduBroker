@@ -6,8 +6,6 @@ import (
 	"k8sEduBroker/logger"
 	"net/http"
 	"os"
-
-	"k8s.io/client-go/kubernetes"
 )
 
 type BrokerConfig struct {
@@ -19,11 +17,7 @@ type BrokerConfig struct {
 	PromProtocol     string `json:"prometheusProtocol"`
 }
 
-var G_k8sClient *kubernetes.Clientset
 var G_BrokerConf BrokerConfig
-
-func GetK8sClient() *kubernetes.Clientset          { return G_k8sClient }
-func SetK8sClient(clientSet *kubernetes.Clientset) { G_k8sClient = clientSet }
 
 func ReadBrokerConfig() BrokerConfig {
 
@@ -43,7 +37,6 @@ func ReadBrokerConfig() BrokerConfig {
 
 	SetBrokerConf(brokerConfig)
 
-	logger.Info("read broker config done... ")
 	return brokerConfig
 }
 

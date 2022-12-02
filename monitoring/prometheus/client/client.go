@@ -11,16 +11,14 @@ import (
 
 var G_Prometheus prom.Client
 
-func GetPrometheusClient() prom.Client { return G_Prometheus }
-
+func GetPrometheusClient() prom.Client       { return G_Prometheus }
 func SetPrometheusClient(client prom.Client) { G_Prometheus = client }
-
 func NewPrometheusClient() prom.Client {
 
 	promClient, err := prom.NewClient(prom.Config{
 		Address: fmt.Sprintf("%s://%s:%s",
-			util.ReadBrokerConfig().PromProtocol,
-			util.ReadBrokerConfig().PromAddress,
+			util.GetBrokerConf().PromProtocol,
+			util.GetBrokerConf().PromAddress,
 			strconv.Itoa(util.ReadBrokerConfig().PromPort),
 		),
 	})

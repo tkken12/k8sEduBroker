@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"k8sEduBroker/api/dashboard"
 	"k8sEduBroker/api/pod"
 	"k8sEduBroker/common"
 	"k8sEduBroker/logger"
@@ -19,7 +20,7 @@ type RequestHandler struct {
 	RestMethod string
 }
 
-var PodHandler = []RequestHandler{
+var podHandler = []RequestHandler{
 	{"/api/v1/pod", pod.PodHandler, common.POST},
 	{"/api/v1/pod", pod.PodHandler, common.PUT},
 	{"/api/v1/pod", pod.PodHandler, common.DELETE},
@@ -27,8 +28,13 @@ var PodHandler = []RequestHandler{
 	// {"api/v1/node", }
 }
 
+var dashboardHandler = []RequestHandler{
+	{"/api/v1/dashboard", dashboard.DashboardGetHandler, common.GET},
+}
+
 var Handlers = [][]RequestHandler{
-	PodHandler,
+	podHandler,
+	dashboardHandler,
 }
 
 func SendResponse(w http.ResponseWriter, resBody ResponseBody) {

@@ -6,6 +6,7 @@ import (
 
 	api "k8sEduBroker/api"
 	kClient "k8sEduBroker/kubernetes/client"
+	pClient "k8sEduBroker/monitoring/prometheus/client"
 
 	"github.com/gorilla/mux"
 )
@@ -20,6 +21,9 @@ func init() {
 
 	kClient.NewClient()
 	logger.Info("k8s initialize done.")
+
+	pClient.NewPrometheusClient()
+	logger.Info("prometheus initialize done.")
 }
 
 func GetServer() *mux.Router {

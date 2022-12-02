@@ -12,7 +12,7 @@ import (
 var G_k8sClient *kubernetes.Clientset
 
 func GetK8sClient() *kubernetes.Clientset          { return G_k8sClient }
-func SetK8sClient(clientSet *kubernetes.Clientset) { G_k8sClient = clientSet }
+func setK8sClient(clientSet *kubernetes.Clientset) { G_k8sClient = clientSet }
 
 func buildConfig(configPath string) *rest.Config {
 	kubeConfig, err := clientcmd.BuildConfigFromFlags("", configPath)
@@ -23,8 +23,8 @@ func buildConfig(configPath string) *rest.Config {
 	return kubeConfig
 }
 
-func NewClient() *kubernetes.Clientset {
-	k8sConfigPath := util.ReadBrokerConfig().K8sConfigPath
+func NewClient() {
+	k8sConfigPath := util.GetBrokerConf().K8sConfigPath
 	if k8sConfigPath == "" {
 		k8sConfigPath = "/root/.kube/config"
 	}
@@ -34,5 +34,5 @@ func NewClient() *kubernetes.Clientset {
 		logger.Fatal("Failed to set kubernetes client. invalid config " + err.Error())
 	}
 
-	return clientSet
+	setK8sClient(clientSet)
 }
