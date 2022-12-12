@@ -66,5 +66,4 @@ func GetAllNodeProcessor(nodes *v1.NodeList) (int64, int64, int64) {
 		cpuTotal += cpuCapa
 		memTotal += memCapa
 	}
-
 }
