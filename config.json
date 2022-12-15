@@ -4,5 +4,6 @@
     "brokerProtocol": "http",
     "prometheusAddress": "10.101.59.45",
     "prometheusPort": 80,
-    "prometheusProtocol": "http"
+    "prometheusProtocol": "http",
+    "prometheusTimeoutSecond": 5
 }

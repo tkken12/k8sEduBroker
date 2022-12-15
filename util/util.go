@@ -4,17 +4,19 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"k8sEduBroker/logger"
+	"math"
 	"net/http"
 	"os"
 )
 
 type BrokerConfig struct {
-	K8sConfigPath    string `json:"kubeConfigPath"`
-	BrokerListenPort int    `json:"brokerListenPort"`
-	BrokerProtocol   string `json:"brokerProtocol"`
-	PromAddress      string `json:"prometheusAddress"`
-	PromPort         int    `json:"prometheusPort"`
-	PromProtocol     string `json:"prometheusProtocol"`
+	K8sConfigPath     string `json:"kubeConfigPath"`
+	BrokerListenPort  int    `json:"brokerListenPort"`
+	BrokerProtocol    string `json:"brokerProtocol"`
+	PromAddress       string `json:"prometheusAddress"`
+	PromPort          int    `json:"prometheusPort"`
+	PromProtocol      string `json:"prometheusProtocol"`
+	PromTimeoutSecond int    `json:"prometheusTimeoutSecond"`
 }
 
 var G_BrokerConf BrokerConfig
@@ -59,4 +61,17 @@ func SendResponse(w http.ResponseWriter, resBody ResponseBody) {
 
 	w.Write(resBodyMarshal)
 	return
+}
+
+func KitoGI(decimalSize int64) int64 {
+	return decimalSize / (1024 * 1024 * 1024)
+}
+
+func ByteToGi(decimalSize int64) int64 {
+	return decimalSize / (1024 * 1024 * 1024 * 1024)
+}
+
+func RoundFloat(val float64, precision uint) float64 {
+	ratio := math.Pow(10, float64(precision))
+	return math.Round(val*ratio) / ratio
 }

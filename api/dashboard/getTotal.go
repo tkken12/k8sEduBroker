@@ -4,7 +4,11 @@ import (
 	"k8sEduBroker/common"
 	reqNode "k8sEduBroker/kubernetes/node"
 	reqPod "k8sEduBroker/kubernetes/pod"
+	"k8sEduBroker/util"
 
+	pQuery "k8sEduBroker/monitoring/prometheus/query"
+
+	"github.com/prometheus/common/model"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -26,6 +30,7 @@ func (dashboardBody *DashboardBody) TotalMerger() {
 		dashboardBody.MasterTotal = 0
 		dashboardBody.WorkerTotal = 0
 		nodeErrFlag = true
+
 	} else {
 		dashboardBody.NodeTotal = len(nodes.Items)
 	}
@@ -35,6 +40,7 @@ func (dashboardBody *DashboardBody) TotalMerger() {
 	}
 
 	dashboardBody.MasterTotal, dashboardBody.WorkerTotal = GetNodeRoleTotal(nodes)
+	dashboardBody.CPUTotal, dashboardBody.MemoryTotal, dashboardBody.DiskTotal = GetAllNodeProcessor(nodes)
 }
 
 func GetNodeRoleTotal(nodes *v1.NodeList) (int, int) {
@@ -59,6 +65,9 @@ func GetAllNodeProcessor(nodes *v1.NodeList) (int64, int64, int64) {
 	var memTotal int64 = 0
 	var diskTotal int64 = 0
 
+	queryResult := pQuery.QueryResult{}
+	queryResult.QueryCall(pQuery.NODE_DISK_TOTAL)
+
 	for _, node := range nodes.Items {
 		cpuCapa, _ := node.Status.Capacity.Cpu().AsInt64()
 		memCapa, _ := node.Status.Capacity.Memory().AsInt64() // kibibyte
@@ -66,4 +75,9 @@ func GetAllNodeProcessor(nodes *v1.NodeList) (int64, int64, int64) {
 		cpuTotal += cpuCapa
 		memTotal += memCapa
 	}
+
+	memTotal = util.KitoGI(memTotal)
+	diskTotal = util.KitoGI(int64(queryResult.Value.(model.Vector)[0].Value))
+
+	return cpuTotal, memTotal, diskTotal
 }

@@ -22,7 +22,7 @@ func init() {
 	kClient.NewClient()
 	logger.Info("k8s initialize done.")
 
-	pClient.NewPrometheusClient()
+	pClient.SetPrometheusClient()
 	logger.Info("prometheus initialize done.")
 }
 
