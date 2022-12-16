@@ -13,4 +13,6 @@ const (
 	HTTP_FORBIDDEN = 403
 
 	LABEL_MASTER_ROLE = "node-role.kubernetes.io/control-plane"
+	ROLE_WORKER       = "Worker"
+	ROLE_MASTER       = "Master"
 )

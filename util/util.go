@@ -19,6 +19,11 @@ type BrokerConfig struct {
 	PromTimeoutSecond int    `json:"prometheusTimeoutSecond"`
 }
 
+type ResponseBody struct {
+	Code    int
+	Message interface{}
+}
+
 var G_BrokerConf BrokerConfig
 
 func ReadBrokerConfig() BrokerConfig {
@@ -44,11 +49,6 @@ func ReadBrokerConfig() BrokerConfig {
 
 func GetBrokerConf() BrokerConfig         { return G_BrokerConf }
 func SetBrokerConf(readConf BrokerConfig) { G_BrokerConf = readConf }
-
-type ResponseBody struct {
-	Code    int
-	Message interface{}
-}
 
 func SendResponse(w http.ResponseWriter, resBody ResponseBody) {
 	w.Header().Set("Content-Type", "application/json")
