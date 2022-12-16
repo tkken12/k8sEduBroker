@@ -18,29 +18,29 @@ func (dashboardBody *DashboardBody) TotalMerger() {
 
 	pods, err := reqPod.GetPods()
 	if err != nil {
-		dashboardBody.PodTotal = 0
+		dashboardBody.Total.PodTotal = 0
 		podErrFlag = true
 	} else {
-		dashboardBody.PodTotal = len(pods.Items)
+		dashboardBody.Total.PodTotal = len(pods.Items)
 	}
 
 	nodes, err := reqNode.GetNodeList()
 	if err != nil {
-		dashboardBody.NodeTotal = 0
-		dashboardBody.MasterTotal = 0
-		dashboardBody.WorkerTotal = 0
+		dashboardBody.Total.NodeTotal = 0
+		dashboardBody.Total.MasterTotal = 0
+		dashboardBody.Total.WorkerTotal = 0
 		nodeErrFlag = true
 
 	} else {
-		dashboardBody.NodeTotal = len(nodes.Items)
+		dashboardBody.Total.NodeTotal = len(nodes.Items)
 	}
 
 	if podErrFlag && nodeErrFlag {
 		return
 	}
 
-	dashboardBody.MasterTotal, dashboardBody.WorkerTotal = GetNodeRoleTotal(nodes)
-	dashboardBody.CPUTotal, dashboardBody.MemoryTotal, dashboardBody.DiskTotal = GetAllNodeProcessor(nodes)
+	dashboardBody.Total.MasterTotal, dashboardBody.Total.WorkerTotal = GetNodeRoleTotal(nodes)
+	dashboardBody.Total.CPUTotal, dashboardBody.Total.MemoryTotal, dashboardBody.Total.DiskTotal = GetAllNodeProcessor(nodes)
 }
 
 func GetNodeRoleTotal(nodes *v1.NodeList) (int, int) {
