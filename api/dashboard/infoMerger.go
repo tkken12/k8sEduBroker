@@ -1,7 +1,5 @@
 package dashboard
 
-import v1 "k8s.io/api/core/v1"
-
 type DashboardBody struct {
 	Total       DashboardTotal         `json:"total"`
 	TableInfo   []DashboardTableBody   `json:"tableInfo"`
@@ -19,12 +17,12 @@ type DashboardTotal struct {
 }
 
 type DashboardTableBody struct {
-	NodeName   string           `json:"nodeName"`
-	Role       string           `json:"role"`
-	Address    []v1.NodeAddress `json:"address"`
-	OS         string           `json:"os"`
-	Kernel     string           `json:"kernel"`
-	K8sVersion string           `json:"k8sVersion"`
+	NodeName   string `json:"nodeName"`
+	Role       string `json:"role"`
+	Address    string `json:"address"`
+	OS         string `json:"os"`
+	Kernel     string `json:"kernelVersion"`
+	K8sVersion string `json:"k8sVersion"`
 }
 
 type DashboardUtilization struct {

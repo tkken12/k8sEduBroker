@@ -17,7 +17,7 @@ func (dashboardBody *DashboardBody) TableInfoMerger() {
 		dashboardBody.TableInfo = append(dashboardBody.TableInfo, DashboardTableBody{
 			NodeName:   node.Name,
 			Role:       kNode.FindNodeRole(node.Labels),
-			Address:    node.Status.Addresses,
+			Address:    node.Status.Addresses[0].Address,
 			OS:         node.Status.NodeInfo.OSImage,
 			Kernel:     node.Status.NodeInfo.KernelVersion,
 			K8sVersion: node.Status.NodeInfo.KubeletVersion,
