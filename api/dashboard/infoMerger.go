@@ -52,6 +52,7 @@ type NodeCondition struct {
 	PIDPressure        []NodePressure `json:"pidPressure"`
 	DiskPressure       []NodePressure `json:"diskPressure"`
 	NetworkUnavailable []NodePressure `json:"networkUnavailable"`
+	NodeReady          []NodePressure `json:"nodeReady"`
 }
 
 // TODO

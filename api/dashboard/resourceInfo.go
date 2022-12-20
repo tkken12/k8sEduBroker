@@ -2,8 +2,11 @@ package dashboard
 
 import (
 	"fmt"
+	"k8sEduBroker/kubernetes/node"
+	"k8sEduBroker/logger"
 	pQuery "k8sEduBroker/monitoring/prometheus/query"
 	"k8sEduBroker/util"
+	"strconv"
 	"strings"
 
 	"github.com/prometheus/common/model"
@@ -22,8 +25,6 @@ func (nodeInfo *DashboardNodeInfo) NodeInfoMerger(nodes *v1.NodeList, nodeErr er
 		return
 	}
 
-	condition := NodeCondition{}
-
 	query := NodeQuery{}
 	query.CPUQuery.QueryCall(pQuery.NODE_CPU_UTILIZATION)
 	query.MemoryQuery.QueryCall(pQuery.NODE_MEMORY_UTILIZATION)
@@ -31,7 +32,7 @@ func (nodeInfo *DashboardNodeInfo) NodeInfoMerger(nodes *v1.NodeList, nodeErr er
 
 	for _, node := range nodes.Items {
 		nodeInfo.NodeResource.utilizationMerger(node, query)
-		condition.conditionMerger(node)
+		nodeInfo.NodeCondition.conditionMerger(node)
 	}
 
 }
@@ -60,22 +61,35 @@ func getUtilization(node v1.Node, queryResult pQuery.QueryResult) ResourceUtiliz
 	return resourceBody
 }
 
-func getMemoryUtilization(node v1.Node, memoryQueryResult pQuery.QueryResult) ResourceUtilization {
-	resourceBody := ResourceUtilization{}
-
-	return resourceBody
+func (condition *NodeCondition) conditionMerger(nodeItem v1.Node) {
+	condition.MemoryPressure = append(condition.MemoryPressure, getPressure(nodeItem, node.NODE_PRESSURE_MEMORY))
+	condition.PIDPressure = append(condition.PIDPressure, getPressure(nodeItem, node.NODE_PRESSURE_PID))
+	condition.DiskPressure = append(condition.DiskPressure, getPressure(nodeItem, node.NODE_PRESSURE_DISK))
+	condition.NetworkUnavailable = append(condition.NetworkUnavailable, getPressure(nodeItem, node.NODE_PRESSURE_NETWORK))
+	condition.NodeReady = append(condition.NodeReady, getPressure(nodeItem, node.NODE_PRESSURE_READY))
 }
 
-func getDiskIO(node v1.Node, diskQueryResult pQuery.QueryResult) ResourceUtilization {
-	resourceBody := ResourceUtilization{}
+func getPressure(node v1.Node, conditionType string) NodePressure {
 
-	return resourceBody
-}
+	var nodeName string
+	var pressure bool
+	for _, condition := range node.Status.Conditions {
+		if conditionType == string(condition.Type) {
+			nodeName = string(condition.Type)
+			pressure = func() bool {
+				bool, err := strconv.ParseBool(string(condition.Status))
+				if err != nil {
+					logger.Warn("failed to parse bool of node pressure")
+					return false
+				}
+				return bool
+			}()
+			break
+		}
+	}
 
-func (condition *NodeCondition) conditionMerger(node v1.Node) {
-	getPressure()
-}
-
-func getPressure() {
-
+	return NodePressure{
+		NodeName: nodeName,
+		Pressure: pressure,
+	}
 }
