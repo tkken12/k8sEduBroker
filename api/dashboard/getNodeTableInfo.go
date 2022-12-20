@@ -2,16 +2,11 @@ package dashboard
 
 import (
 	kNode "k8sEduBroker/kubernetes/node"
-	"k8sEduBroker/logger"
+
+	v1 "k8s.io/api/core/v1"
 )
 
-func (dashboardBody *DashboardBody) TableInfoMerger() {
-
-	nodes, err := kNode.GetNodeList()
-	if err != nil {
-		logger.Warn(err.Error())
-		return
-	}
+func (dashboardBody *DashboardBody) TableInfoMerger(nodes *v1.NodeList, nodeErr error) {
 
 	for _, node := range nodes.Items {
 		dashboardBody.TableInfo = append(dashboardBody.TableInfo, DashboardTableBody{

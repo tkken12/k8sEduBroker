@@ -2,7 +2,6 @@ package dashboard
 
 import (
 	"k8sEduBroker/common"
-	reqNode "k8sEduBroker/kubernetes/node"
 	reqPod "k8sEduBroker/kubernetes/pod"
 	"k8sEduBroker/util"
 
@@ -12,7 +11,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-func (dashboardBody *DashboardBody) TotalMerger() {
+func (dashboardBody *DashboardBody) TotalMerger(nodes *v1.NodeList, nodeErr error) {
 
 	podErrFlag, nodeErrFlag := false, false // pod, nodes 모두 에러일 때
 
@@ -24,8 +23,8 @@ func (dashboardBody *DashboardBody) TotalMerger() {
 		dashboardBody.Total.PodTotal = len(pods.Items)
 	}
 
-	nodes, err := reqNode.GetNodeList()
-	if err != nil {
+	// nodes, err := reqNode.GetNodeList()
+	if nodeErr != nil {
 		dashboardBody.Total.NodeTotal = 0
 		dashboardBody.Total.MasterTotal = 0
 		dashboardBody.Total.WorkerTotal = 0

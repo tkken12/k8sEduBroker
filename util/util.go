@@ -7,6 +7,8 @@ import (
 	"math"
 	"net/http"
 	"os"
+
+	v1 "k8s.io/api/core/v1"
 )
 
 type BrokerConfig struct {
@@ -74,4 +76,14 @@ func ByteToGi(decimalSize int64) int64 {
 func RoundFloat(val float64, precision uint) float64 {
 	ratio := math.Pow(10, float64(precision))
 	return math.Round(val*ratio) / ratio
+}
+
+func FindNodeNameByAddress(address string, nodeItem v1.Node) string {
+	for _, inf := range nodeItem.Status.Addresses {
+		if inf.Address == address {
+			return nodeItem.Name
+		}
+	}
+
+	return ""
 }
