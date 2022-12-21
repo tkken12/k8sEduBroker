@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"k8sEduBroker/logger"
 	"k8sEduBroker/util"
 
@@ -16,7 +17,10 @@ func init() {
 	logger.LoggerInit()
 	logger.Info("logger initialize done.")
 
-	util.SetBrokerConf(util.ReadBrokerConfig())
+	configPath := flag.String("config", "/.k8sEdu/config.json", "set broker config path")
+	flag.Parse()
+
+	util.SetBrokerConf(util.ReadBrokerConfig(configPath))
 	logger.Info("configuration read succeed")
 
 	kClient.NewClient()

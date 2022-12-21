@@ -19,7 +19,7 @@ func NewPrometheusClient() prom.Client {
 		Address: fmt.Sprintf("%s://%s:%s",
 			util.GetBrokerConf().PromProtocol,
 			util.GetBrokerConf().PromAddress,
-			strconv.Itoa(util.ReadBrokerConfig().PromPort),
+			strconv.Itoa(util.GetBrokerConf().PromPort),
 		),
 	})
 	if err != nil {
