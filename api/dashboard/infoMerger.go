@@ -1,6 +1,8 @@
 package dashboard
 
-import "k8sEduBroker/kubernetes/node"
+import (
+	"k8sEduBroker/kubernetes/node"
+)
 
 type DashboardBody struct {
 	Total     DashboardTotal       `json:"total"`
@@ -35,7 +37,7 @@ type DashboardNodeInfo struct {
 type NodeResource struct {
 	CPUUtilization    []ResourceUtilization `json:"nodeCpuUtilization"`
 	MemoryUtilization []ResourceUtilization `json:"nodeMemoryUtilization"`
-	DiskIO            []ResourceUtilization `json:"nodeDiskiO"`
+	DiskIO            []ResourceUtilization `json:"nodeDiskIO"`
 }
 
 type ResourceUtilization struct {
@@ -47,6 +49,7 @@ type NodePressure struct {
 	NodeName string `json:"nodeName"`
 	Pressure bool   `json:"pressure"`
 }
+
 type NodeCondition struct {
 	MemoryPressure     []NodePressure `json:"memoryPressure"`
 	PIDPressure        []NodePressure `json:"pidPressure"`
