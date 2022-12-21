@@ -28,11 +28,11 @@ type ResponseBody struct {
 
 var G_BrokerConf BrokerConfig
 
-func ReadBrokerConfig() BrokerConfig {
+func ReadBrokerConfig(configPath *string) BrokerConfig {
 
 	var brokerConfig BrokerConfig
 
-	configFile, err := os.Open("/.k8sEdu/config.json")
+	configFile, err := os.Open(*configPath)
 	if err != nil {
 		logger.Fatal("kubernetes education broker configuration file is required " + err.Error())
 	}

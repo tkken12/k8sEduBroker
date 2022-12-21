@@ -3,11 +3,11 @@ package pod
 import (
 	"encoding/json"
 	"io/ioutil"
+	"k8sEduBroker/common"
+	"k8sEduBroker/kubernetes/pod"
 	"k8sEduBroker/logger"
 	"k8sEduBroker/util"
 	"net/http"
-
-	v1 "k8s.io/api/core/v1"
 )
 
 type PodRequestStruct struct {
@@ -17,12 +17,10 @@ type PodRequestStruct struct {
 }
 
 type PodRequestParams struct {
-	PodName       string           `json:"podName"`
-	PodNamespaces []string         `json:"podNamespaces"`
-	PodAddress    string           `json:"podAddress"`
-	VolumeMount   []v1.VolumeMount `json:"volumeMount"`
-	Volumes       []v1.Volume      `json:"volumes"`
-	NodeName      string           `json:"nodeName"`
+	PodName       string   `json:"podName"`
+	PodNamespaces []string `json:"podNamespaces"`
+	PodAddress    string   `json:"podAddress"`
+	NodeName      string   `json:"nodeName"`
 }
 
 func readGetRequest(w http.ResponseWriter, r *http.Request) PodRequestStruct {
@@ -53,11 +51,6 @@ func readRequest(w http.ResponseWriter, r *http.Request) PodRequestStruct {
 	return podInfo
 }
 
-/*func PodGetHandler(w http.ResponseWriter, r *http.Request) {
-	podGetInfo := readGetRequest(w, r)
-
-}*/
-
 func PodHandler(w http.ResponseWriter, r *http.Request) {
 	podInfo := readRequest(w, r)
 
@@ -65,16 +58,33 @@ func PodHandler(w http.ResponseWriter, r *http.Request) {
 	case CREATE:
 		return
 
-	case GET:
+	case DELETE:
+		return
+
+	case EDIT:
 		return
 	}
 }
 
 func PodGetHandler(w http.ResponseWriter, r *http.Request) {
-	// podInfo := readGetRequest(w, r)
+	podInfo := readGetRequest(w, r)
+
+	var code int
+	var message pod.PodGetBody
+
+	if len(podInfo.Params.PodNamespaces) == 0 {
+		pods, err := pod.GetPods()
+		if err != nil {
+			code = common.HTTP_INTERNAL_ERROR
+		}
+
+		for _, pod := range pods.Items {
+			message.PodParser(pod)
+		}
+	}
 
 	util.SendResponse(w, util.ResponseBody{
-		Code:    200,
-		Message: "test",
+		Code:    code,
+		Message: message,
 	})
 }

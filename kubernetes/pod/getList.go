@@ -10,16 +10,27 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type PodGetResBody struct {
-	PodName      string           `json:"podName"`
-	PodNamespace string           `json:"podNamespace"`
-	PodAddress   string           `json:"podAddress"`
-	VolumeMount  []v1.VolumeMount `json:"volumeMount"`
-	Volumes      []v1.Volume      `json:"volumes"`
-	NodeName     string           `json:"nodeName"`
+type PodGetBody struct {
+	PodInfo []PodInfo `json:"podInfo"`
+}
+type PodInfo struct {
+	PodName    string         `json:"podName"`
+	Namespace  string         `json:"namespace"`
+	Address    string         `json:"address"`
+	Volume     []v1.Volume    `json:"volume"`
+	Containers []v1.Container `json:"containers"`
+	NodeName   string         `json:"nodeName"`
+	HostName   string         `json:"hostName"`
+	Phase      v1.PodPhase    `json:"phase"`
+	// PodCondition PodCondition   `json:"condition"`
+	CreationTime *metav1.Time `json:"creationTime"`
+	StartTime    *metav1.Time `json:"startTime"`
 }
 
-type PodsBody []PodGetResBody
+type PodCondition struct {
+	Type   v1.PodConditionType `json:"type"`
+	Status v1.ConditionStatus  `json:"status"`
+}
 
 func GetPods() (*v1.PodList, error) {
 	pods, err := kClient.GetK8sClient().CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
@@ -30,15 +41,15 @@ func GetPods() (*v1.PodList, error) {
 	return pods, nil
 }
 
-func (podReqBody *PodGetResBody) extractPodList(pods *v1.PodList, filteredItems PodsBody, namespaces []string) {
-	for idx, _ := range namespaces {
-		for _, pod := range pods.Items {
-			if pod.Namespace == namespaces[idx] {
-				podReqBody.PodName = pod.Name
-			}
-		}
-	}
-}
+// func (podInfo *PodInfo) extractPodList(pods *v1.PodList, filteredItems PodsBody, namespaces []string) {
+// 	for idx, _ := range namespaces {
+// 		for _, pod := range pods.Items {
+// 			if pod.Namespace == namespaces[idx] {
+// 				podInfo.PodName = pod.Name
+// 			}
+// 		}
+// 	}
+// }
 
 func GetPodAtNodes(nodeNames []string) map[string]*v1.PodList {
 
@@ -57,4 +68,23 @@ func GetPodAtNodes(nodeNames []string) map[string]*v1.PodList {
 	}
 
 	return podListByNodes
+}
+
+func (podGetBody *PodGetBody) PodParser(podItem v1.Pod) {
+
+	podGetBody.PodInfo = append(podGetBody.PodInfo, PodInfo{
+		PodName:    podItem.Name,
+		Namespace:  podItem.Namespace,
+		Address:    podItem.Status.PodIP,
+		Volume:     podItem.Spec.Volumes,
+		Containers: podItem.Spec.Containers,
+		NodeName:   podItem.Spec.NodeName,
+		HostName:   podItem.Spec.Hostname,
+		Phase:      podItem.Status.Phase,
+		// PodCondition: PodCondition{
+		// 	Type: podItem.Status.Conditions[],
+		// },
+		CreationTime: &podItem.CreationTimestamp,
+		StartTime:    podItem.Status.StartTime,
+	})
 }

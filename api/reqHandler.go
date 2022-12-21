@@ -24,8 +24,7 @@ var podHandler = []RequestHandler{
 	{"/api/v1/pod", pod.PodHandler, common.POST},
 	{"/api/v1/pod", pod.PodHandler, common.PUT},
 	{"/api/v1/pod", pod.PodHandler, common.DELETE},
-	{"/api/v1/pod", pod.PodHandler, common.GET},
-	// {"api/v1/node", }
+	{"/api/v1/pod", pod.PodGetHandler, common.GET},
 }
 
 var dashboardHandler = []RequestHandler{
