@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"k8sEduBroker/common"
+	"k8sEduBroker/kubernetes/node"
 	"k8sEduBroker/kubernetes/pod"
 	"k8sEduBroker/logger"
 	"k8sEduBroker/util"
@@ -72,6 +73,9 @@ func PodGetHandler(w http.ResponseWriter, r *http.Request) {
 	var code int
 	var message pod.PodGetBody
 
+	nodeCapa := node.GetNodeCapacity()
+	podMetricses := pod.GetPodMetricses()
+
 	if len(podInfo.Params.PodNamespaces) == 0 {
 		pods, err := pod.GetPods()
 		if err != nil {
@@ -79,7 +83,7 @@ func PodGetHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, pod := range pods.Items {
-			message.PodParser(pod)
+			message.PodParser(pod, nodeCapa, podMetricses)
 		}
 	}
 

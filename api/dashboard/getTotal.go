@@ -49,11 +49,13 @@ func GetNodeRoleTotal(nodes *v1.NodeList) (int, int) {
 		for key, _ := range node.Labels {
 			if key == common.LABEL_MASTER_ROLE {
 				masterTotal++
-			} else {
-				workerTotal++
+				break
 			}
 		}
+		workerTotal++
 	}
+
+	workerTotal -= masterTotal
 
 	return masterTotal, workerTotal
 }
@@ -76,7 +78,11 @@ func GetAllNodeProcessor(nodes *v1.NodeList) (int64, int64, int64) {
 	}
 
 	memTotal = util.KitoGI(memTotal)
-	diskTotal = util.KitoGI(int64(queryResult.Value.(model.Vector)[0].Value))
+	if queryResult.Value == nil {
+		diskTotal = 0
+	} else {
+		diskTotal = util.KitoGI(int64(queryResult.Value.(model.Vector)[0].Value))
+	}
 
 	return cpuTotal, memTotal, diskTotal
 }

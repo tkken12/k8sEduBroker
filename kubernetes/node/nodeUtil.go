@@ -1,6 +1,14 @@
 package node
 
-import "k8sEduBroker/common"
+import (
+	"k8sEduBroker/common"
+	"k8sEduBroker/logger"
+)
+
+type NodeResourceCapacity struct {
+	CpuCore     int64
+	MemoryTotal int64
+}
 
 const (
 	NODE_PRESSURE_MEMORY  = "MemoryPressure"
@@ -22,4 +30,31 @@ func FindNodeRole(labels map[string]string) string {
 	}
 
 	return role
+}
+
+func GetNodeCapacity() map[string]NodeResourceCapacity {
+
+	newMap := make(map[string]NodeResourceCapacity)
+
+	nodes, err := GetNodeList()
+	if err != nil {
+		logger.Warn(err.Error())
+		return newMap
+	}
+
+	for _, node := range nodes.Items {
+
+		newMap[node.Name] = NodeResourceCapacity{
+			CpuCore: func() int64 {
+				cpu, isOk := node.Status.Capacity.Cpu().AsInt64()
+				if isOk == false {
+					return 0
+				}
+				return cpu
+			}(),
+			MemoryTotal: node.Status.Capacity.Memory().Value(),
+		}
+	}
+
+	return newMap
 }

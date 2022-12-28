@@ -5,14 +5,17 @@ import (
 	"k8sEduBroker/logger"
 
 	kClient "k8sEduBroker/kubernetes/client"
+	"k8sEduBroker/kubernetes/node"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/metrics/pkg/apis/metrics/v1beta1"
 )
 
 type PodGetBody struct {
 	PodInfo []PodInfo `json:"podInfo"`
 }
+
 type PodInfo struct {
 	PodName    string         `json:"podName"`
 	Namespace  string         `json:"namespace"`
@@ -25,6 +28,7 @@ type PodInfo struct {
 	// PodCondition PodCondition   `json:"condition"`
 	CreationTime *metav1.Time `json:"creationTime"`
 	StartTime    *metav1.Time `json:"startTime"`
+	Metric       PodMetric    `json:"metric"`
 }
 
 type PodCondition struct {
@@ -32,8 +36,18 @@ type PodCondition struct {
 	Status v1.ConditionStatus  `json:"status"`
 }
 
+type PodMetric struct {
+	Name   string         `json:"podName"`
+	CPU    PodMetricValue `json:"cpu"`
+	Memory PodMetricValue `json:"memory"`
+}
+
+type PodMetricValue struct {
+	Value float64 `json:"value"`
+}
+
 func GetPods() (*v1.PodList, error) {
-	pods, err := kClient.GetK8sClient().CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+	pods, err := kClient.GetK8sClient().CoreV1().Pods(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +70,7 @@ func GetPodAtNodes(nodeNames []string) map[string]*v1.PodList {
 	podListByNodes := make(map[string]*v1.PodList)
 
 	for _, nodeName := range nodeNames {
-		pods, err := kClient.GetK8sClient().CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{
+		pods, err := kClient.GetK8sClient().CoreV1().Pods(metav1.NamespaceAll).List(context.TODO(), metav1.ListOptions{
 			FieldSelector: "spec.nodeName=" + nodeName,
 		})
 		if err != nil {
@@ -70,7 +84,9 @@ func GetPodAtNodes(nodeNames []string) map[string]*v1.PodList {
 	return podListByNodes
 }
 
-func (podGetBody *PodGetBody) PodParser(podItem v1.Pod) {
+func (podGetBody *PodGetBody) PodParser(podItem v1.Pod,
+	nodeCapa map[string]node.NodeResourceCapacity,
+	podMetricses *v1beta1.PodMetricsList) {
 
 	podGetBody.PodInfo = append(podGetBody.PodInfo, PodInfo{
 		PodName:    podItem.Name,
@@ -86,5 +102,6 @@ func (podGetBody *PodGetBody) PodParser(podItem v1.Pod) {
 		// },
 		CreationTime: &podItem.CreationTimestamp,
 		StartTime:    podItem.Status.StartTime,
+		Metric:       GetPodMetric(podItem, nodeCapa, podMetricses),
 	})
 }
